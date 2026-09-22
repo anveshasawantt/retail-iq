@@ -1,4 +1,21 @@
 ﻿node_modules/
 dist/
 .env
-.env.local
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.pyo
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+data/BigBasket Products.csv
