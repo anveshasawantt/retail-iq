@@ -46,7 +46,9 @@ export default function InventoryPage({ navigate }) {
       } else if (selectedStatus === "warning") {
         matchesStatus = p.urgency === "warning";
       } else if (selectedStatus === "healthy") {
-        matchesStatus = p.urgency === "normal" || p.urgency === "optimal";
+        // urgency values from forecastingEngine: "normal" | "critical" | "warning" | "excess"
+        // "excess" (slow-moving) is still stock-healthy from a reorder perspective
+        matchesStatus = p.urgency === "normal" || p.urgency === "excess";
       }
 
       return matchesSearch && matchesCategory && matchesStatus;

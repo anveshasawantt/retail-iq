@@ -140,7 +140,9 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
         salesMap[item.productId] = { unitsSold: 0, revenue: 0, name: item.name };
       }
       salesMap[item.productId].unitsSold += item.quantity;
-      salesMap[item.productId].revenue += item.lineTotal;
+      // Safely derive revenue: prefer lineTotal, fall back to quantity × unitPrice
+      const lineRevenue = item.lineTotal != null ? item.lineTotal : (item.quantity * (item.unitPrice || 0));
+      salesMap[item.productId].revenue += lineRevenue;
     });
   });
 

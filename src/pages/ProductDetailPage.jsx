@@ -7,7 +7,8 @@ import {
   Truck, 
   Sliders, 
   CheckCircle2, 
-  SendHorizontal
+  SendHorizontal,
+  Sparkles
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import { calculateProductVelocity } from "../services/forecastingEngine";
@@ -16,7 +17,7 @@ import Breadcrumbs from "../components/layout/Breadcrumbs";
 import StockAdjustmentModal from "../components/inventory/StockAdjustmentModal";
 
 export default function ProductDetailPage({ productId, navigate }) {
-  const { products, transactions, approveReorder } = useStore();
+  const { products, transactions, stockRiskData, approveReorder } = useStore();
   const [demandMultiplier, setDemandMultiplier] = useState(1.0);
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [orderSentMessage, setOrderSentMessage] = useState(null);
@@ -40,7 +41,24 @@ export default function ProductDetailPage({ productId, navigate }) {
 
   const baseVelocity = calculateProductVelocity(product.id, transactions, 7);
   const simulatedVelocity = Math.max(0.1, Math.round(baseVelocity * demandMultiplier * 10) / 10);
-  
+
+  // Backend ML risk data for this product (from /inventory/stock-risk)
+  const backendRisk = Array.isArray(stockRiskData)
+    ? stockRiskData.find((sr) => sr.product_id === product.id || sr.barcode === product.barcode)
+    : null;
+  const forecastSource = backendRisk?.forecast_source || "velocity_baseline";
+  const isXGBoost = forecastSource === "xgboost";
+  const mlPredictedDemand = backendRisk?.predicted_daily_demand != null
+    ? Number(backendRisk.predicted_daily_demand)
+    : null;
+  const mlDaysUntilStockout = backendRisk?.days_until_stockout != null
+    ? Number(backendRisk.days_until_stockout)
+    : null;
+  const mlRecommendedQty = backendRisk?.recommended_reorder_quantity != null
+    ? Number(backendRisk.recommended_reorder_quantity)
+    : null;
+  const mlStatus = backendRisk?.status || null;
+
   const daysUntilStockout = Math.round((product.currentStock / simulatedVelocity) * 10) / 10;
   const hoursUntilStockout = Math.round(daysUntilStockout * 24);
 
@@ -145,15 +163,30 @@ export default function ProductDetailPage({ productId, navigate }) {
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
-            Sales Velocity
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
+              Sales Velocity
+            </span>
+            {isXGBoost ? (
+              <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-800 border border-indigo-200 rounded font-mono text-[10px] font-bold inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> AI Forecast
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 rounded font-mono text-[10px] font-semibold">
+                Baseline
+              </span>
+            )}
+          </div>
           <div className="mt-2 flex items-baseline gap-2 font-mono">
-            <span className="text-2xl font-bold text-slate-900">{baseVelocity}</span>
+            <span className="text-2xl font-bold text-slate-900">
+              {mlPredictedDemand != null ? mlPredictedDemand : baseVelocity}
+            </span>
             <span className="text-xs text-slate-500">units / day</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">
-            7-day rolling average
+            {mlPredictedDemand != null
+              ? `AI predicted demand (local 7-day: ${baseVelocity})`
+              : "7-day rolling average"}
           </div>
         </div>
 
@@ -228,6 +261,44 @@ export default function ProductDetailPage({ productId, navigate }) {
             </div>
           </div>
         </div>
+
+        {/* Backend ML Reference Row — shown only when backend data is available */}
+        {backendRisk && (
+          <div className="mt-3 p-3 rounded border border-indigo-100 bg-indigo-50/60 text-xs">
+            <div className="flex items-center gap-1.5 font-semibold text-indigo-900 mb-2">
+              {isXGBoost && <Sparkles className="w-3.5 h-3.5 text-indigo-600" />}
+              <span>Backend ML Reference</span>
+              <span className={`ml-auto px-1.5 py-0.5 rounded font-mono text-[10px] uppercase font-bold ${
+                mlStatus === "urgent" ? "bg-rose-100 text-rose-800" :
+                mlStatus === "low_stock" ? "bg-amber-100 text-amber-800" :
+                "bg-emerald-100 text-emerald-800"
+              }`}>
+                {mlStatus || "healthy"}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 font-mono text-slate-700">
+              <div>
+                <div className="text-[10px] text-slate-500 uppercase">AI Demand</div>
+                <div className="font-bold text-slate-900">
+                  {mlPredictedDemand != null ? `${mlPredictedDemand} /day` : "—"}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-500 uppercase">Days to Stockout</div>
+                <div className="font-bold text-slate-900">
+                  {mlDaysUntilStockout != null ? `${mlDaysUntilStockout}d` : "N/A"}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-500 uppercase">ML Reorder Qty</div>
+                <div className="font-bold text-slate-900">
+                  {mlRecommendedQty != null ? `${mlRecommendedQty} units` : "—"}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      
       </div>
 
       {/* Supplier Info & Sales History */}
