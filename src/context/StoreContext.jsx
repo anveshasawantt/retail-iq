@@ -48,24 +48,29 @@ export function StoreProvider({ children }) {
   // 7. Last receipt for modal
   const [lastReceipt, setLastReceipt] = useState(null);
 
-  // 8. API Connectivity & ML Stock-Risk state
+  // 8. API Connectivity, ML Stock-Risk state, and Analytics
   const [isLoading, setIsLoading] = useState(true);
   const [apiConnected, setApiConnected] = useState(false);
   const [stockRiskData, setStockRiskData] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState(null);
 
   // Fetch initial data from FastAPI backend
   const refreshStoreData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [dbProducts, dbInventory, dbTransactions, dbStockRisk] = await Promise.all([
+      const [dbProducts, dbInventory, dbTransactions, dbStockRisk, dbAnalytics] = await Promise.all([
         api.getProducts(0, 500),
         api.getInventory(0, 500),
         api.getTransactions(0, 100),
         api.getStockRisk().catch(() => []),
+        api.getAnalytics(30).catch(() => null),
       ]);
 
       if (Array.isArray(dbStockRisk)) {
         setStockRiskData(dbStockRisk);
+      }
+      if (dbAnalytics && dbAnalytics.daily_revenue) {
+        setAnalyticsData(dbAnalytics);
       }
 
       const invMap = {};
@@ -544,6 +549,7 @@ export function StoreProvider({ children }) {
     isLoading,
     apiConnected,
     stockRiskData,
+    analyticsData,
     refreshStoreData,
     setUnknownBarcodeScanned,
     setLastReceipt,

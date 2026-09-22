@@ -124,6 +124,7 @@ class TransactionItemOut(BaseModel):
         from_attributes = True
 
 
+
 class TransactionOut(BaseModel):
     id: int
     invoice_number: str
@@ -136,4 +137,45 @@ class TransactionOut(BaseModel):
     items: list[TransactionItemOut]
 
     class Config:
-        from_attributes = True
+        from_attributes = True
+
+
+# ── Analytics Schemas ──────────────────────────────────────────────────────────
+
+class DailyRevenue(BaseModel):
+    date: str          # ISO date string "YYYY-MM-DD"
+    revenue: float
+    transaction_count: int
+
+
+class TopProduct(BaseModel):
+    product_id: int
+    name: str
+    category: Optional[str] = None
+    units_sold: int
+    revenue: float
+
+
+class CategoryBreakdown(BaseModel):
+    category: str
+    units_sold: int
+    revenue: float
+
+
+class SlowMover(BaseModel):
+    product_id: int
+    name: str
+    category: Optional[str] = None
+    quantity_on_hand: int
+    daily_velocity: float
+
+
+class AnalyticsOut(BaseModel):
+    daily_revenue: list[DailyRevenue]
+    top_products: list[TopProduct]
+    category_breakdown: list[CategoryBreakdown]
+    slow_movers: list[SlowMover]
+    period_days: int
+    total_revenue: float
+    total_transactions: int
+
