@@ -26,11 +26,24 @@ export default function AddProductModal({ isOpen, initialBarcode = "", onClose, 
 
   useEffect(() => {
     if (initialBarcode) {
-      setFormData((prev) => ({
-        ...prev,
-        barcode: initialBarcode,
-        sku: `SKU-${initialBarcode.slice(-4)}`
-      }));
+      if (typeof initialBarcode === "object") {
+        const code = initialBarcode.barcode || "";
+        setFormData((prev) => ({
+          ...prev,
+          barcode: code,
+          sku: `SKU-${code.slice(-4)}`,
+          name: initialBarcode.name || prev.name,
+          brand: initialBarcode.brand || prev.brand,
+          category: initialBarcode.category || prev.category,
+        }));
+      } else {
+        const code = String(initialBarcode);
+        setFormData((prev) => ({
+          ...prev,
+          barcode: code,
+          sku: `SKU-${code.slice(-4)}`,
+        }));
+      }
     }
   }, [initialBarcode]);
 

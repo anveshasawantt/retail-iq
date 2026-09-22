@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Product, Inventory, Transaction, TransactionItem
-from ..schemas import CheckoutRequest, ReceiptOut, ReceiptLine
+from ..schemas import CheckoutRequest, ReceiptOut, ReceiptLine, TransactionOut, TransactionItemOut
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -125,3 +125,47 @@ def checkout(payload: CheckoutRequest, db: Session = Depends(get_db)):
         total=total,
         payment_mode=payload.payment_mode,
     )
+
+
+@router.get("/transactions", response_model=list[TransactionOut])
+def list_transactions(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    txs = (
+        db.query(Transaction)
+        .order_by(Transaction.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    results = []
+    for tx in txs:
+        items = (
+            db.query(TransactionItem, Product)
+            .join(Product, TransactionItem.product_id == Product.id)
+            .filter(TransactionItem.transaction_id == tx.id)
+            .all()
+        )
+        item_list = [
+            TransactionItemOut(
+                product_id=ti.product_id,
+                barcode=prod.barcode,
+                name=prod.name,
+                quantity=ti.quantity,
+                unit_price=float(ti.unit_price),
+                line_total=float(ti.line_total),
+            )
+            for ti, prod in items
+        ]
+        results.append(
+            TransactionOut(
+                id=tx.id,
+                invoice_number=tx.invoice_number,
+                subtotal=float(tx.subtotal),
+                gst_amount=float(tx.gst_amount),
+                discount_amount=float(tx.discount_amount),
+                total=float(tx.total),
+                payment_mode=tx.payment_mode,
+                created_at=tx.created_at,
+                items=item_list,
+            )
+        )
+    return results

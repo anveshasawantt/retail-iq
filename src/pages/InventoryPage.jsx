@@ -15,7 +15,7 @@ import AddProductModal from "../components/inventory/AddProductModal";
 import StockAdjustmentModal from "../components/inventory/StockAdjustmentModal";
 
 export default function InventoryPage({ navigate }) {
-  const { products, transactions } = useStore();
+  const { products, transactions, stockRiskData } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -23,7 +23,7 @@ export default function InventoryPage({ navigate }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [adjustingProduct, setAdjustingProduct] = useState(null);
 
-  const forecast = generateForecastAnalysis(products, transactions);
+  const forecast = generateForecastAnalysis(products, transactions, stockRiskData);
 
   const categories = useMemo(() => {
     const set = new Set(products.map((p) => p.category));

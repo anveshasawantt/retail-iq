@@ -13,7 +13,8 @@ import {
   SendHorizontal,
   Layers,
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Sparkles
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import { generateForecastAnalysis } from "../services/forecastingEngine";
@@ -25,6 +26,7 @@ export default function DashboardPage({ navigate }) {
     products, 
     transactions, 
     purchaseOrders, 
+    stockRiskData,
     approveReorder, 
     receivePurchaseOrder,
     getActivePOForProduct 
@@ -33,7 +35,7 @@ export default function DashboardPage({ navigate }) {
   const [activePoMessage, setActivePoMessage] = useState(null);
   const [justApprovedPoId, setJustApprovedPoId] = useState(null);
 
-  const forecast = generateForecastAnalysis(products, transactions);
+  const forecast = generateForecastAnalysis(products, transactions, stockRiskData);
 
   // Today's Metrics
   const todayStr = new Date().toISOString().split("T")[0];
@@ -172,7 +174,7 @@ export default function DashboardPage({ navigate }) {
             </h2>
           </div>
           <span className="text-[11px] font-mono text-slate-500">
-            Calculated from 7-day rolling velocity
+            AI-powered demand forecasting with velocity-based fallback
           </span>
         </div>
 
@@ -186,6 +188,7 @@ export default function DashboardPage({ navigate }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {forecast.reorderRecommendations.slice(0, 4).map((item) => {
               const activePO = getActivePOForProduct(item.id);
+              const isXGBoost = item.forecastSource === "xgboost";
               return (
                 <div
                   key={item.id}
@@ -197,16 +200,27 @@ export default function DashboardPage({ navigate }) {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span
-                        className={`text-[10px] font-bold uppercase font-mono px-2 py-0.5 rounded ${
-                          item.urgency === "critical"
-                            ? "bg-rose-600 text-white"
-                            : "bg-amber-600 text-white"
-                        }`}
-                      >
-                        {item.urgency === "critical" ? "URGENT REORDER" : "REORDER SOON"}
-                      </span>
-                      <h3 className="font-bold text-sm text-slate-900 mt-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span
+                          className={`text-[10px] font-bold uppercase font-mono px-2 py-0.5 rounded ${
+                            item.urgency === "critical"
+                              ? "bg-rose-600 text-white"
+                              : "bg-amber-600 text-white"
+                          }`}
+                        >
+                          {item.urgency === "critical" ? "URGENT REORDER" : "REORDER SOON"}
+                        </span>
+                        {isXGBoost ? (
+                          <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 border border-indigo-300 rounded font-mono text-[10px] font-bold inline-flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-indigo-600" /> AI Forecast
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-300 rounded font-mono text-[10px] font-semibold">
+                            Baseline Forecast
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-sm text-slate-900 mt-1.5">
                         {item.name}
                       </h3>
                       <div className="text-[11px] font-mono text-slate-500">
@@ -216,7 +230,7 @@ export default function DashboardPage({ navigate }) {
 
                     <div className="text-right font-mono flex-shrink-0">
                       <div className="text-xs font-bold text-slate-800">
-                        {item.velocity} sold / day
+                        {item.predictedDailyDemand !== undefined ? item.predictedDailyDemand : item.velocity} sold / day
                       </div>
                       <div className="text-[11px] text-rose-600 font-semibold">
                         Stock-out: ~{item.hoursUntilStockout > 48 ? `${Math.round(item.daysUntilStockout)} days` : `${item.hoursUntilStockout}h`}
@@ -284,8 +298,9 @@ export default function DashboardPage({ navigate }) {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/50 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Item & Supplier</th>
+                  <th className="py-3 px-3 text-center">Engine</th>
                   <th className="py-3 px-3 text-center">Stock</th>
-                  <th className="py-3 px-3 text-center">Velocity</th>
+                  <th className="py-3 px-3 text-center">Demand</th>
                   <th className="py-3 px-3 text-center">Lead Time</th>
                   <th className="py-3 px-4 text-right">Order Units</th>
                   <th className="py-3 px-4 text-right">Cost (₹)</th>
@@ -295,6 +310,7 @@ export default function DashboardPage({ navigate }) {
               <tbody className="divide-y divide-slate-100">
                 {forecast.reorderRecommendations.map((item) => {
                   const activePO = getActivePOForProduct(item.id);
+                  const isXGBoost = item.forecastSource === "xgboost";
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="py-3 px-4">
@@ -308,11 +324,22 @@ export default function DashboardPage({ navigate }) {
                           Supplier: {item.supplierName}
                         </div>
                       </td>
+                      <td className="py-3 px-3 text-center">
+                        {isXGBoost ? (
+                          <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 border border-indigo-200 rounded font-mono text-[10px] font-bold">
+                            AI Forecast
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-mono text-[10px] font-medium">
+                            Baseline
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3 px-3 text-center font-mono font-bold text-slate-900">
                         {item.currentStock}
                       </td>
-                      <td className="py-3 px-3 text-center font-mono text-slate-600">
-                        {item.velocity}/day
+                      <td className="py-3 px-3 text-center font-mono text-slate-700 font-semibold">
+                        {item.predictedDailyDemand !== undefined ? item.predictedDailyDemand : item.velocity}/day
                       </td>
                       <td className="py-3 px-3 text-center font-mono text-slate-600">
                         {item.supplierLeadTimeDays}d

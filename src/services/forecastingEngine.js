@@ -30,18 +30,35 @@ export function calculateProductVelocity(productId, transactions, daysWindow = 7
   return Math.round(rawVelocity * 10) / 10;
 }
 
-export function generateForecastAnalysis(products, transactions) {
-  const analyzedProducts = products.map(product => {
+export function generateForecastAnalysis(products, transactions, stockRiskData = []) {
+  const analyzedProducts = products.map((product) => {
     const velocity = calculateProductVelocity(product.id, transactions, 7);
-    
+
+    // Match backend ML stock risk data if available
+    const backendRisk = Array.isArray(stockRiskData)
+      ? stockRiskData.find((sr) => sr.product_id === product.id || sr.barcode === product.barcode)
+      : null;
+
+    const forecastSource = backendRisk?.forecast_source || "velocity_baseline";
+    const predictedDailyDemand =
+      backendRisk?.predicted_daily_demand !== undefined && backendRisk?.predicted_daily_demand !== null
+        ? Number(backendRisk.predicted_daily_demand)
+        : velocity;
+
+    const effectiveVelocity = Math.max(predictedDailyDemand, velocity);
+
     // Safety buffer days to absorb delivery volatility
     const safetyBufferDays = 2;
     const effectiveLeadTime = product.supplierLeadTimeDays + safetyBufferDays;
-    
+
     // Days until stock depletion
-    const daysUntilStockout = velocity > 0 
-      ? Math.round((product.currentStock / velocity) * 10) / 10 
-      : 999;
+    const daysUntilStockout =
+      backendRisk?.days_until_stockout !== undefined && backendRisk?.days_until_stockout !== null
+        ? Number(backendRisk.days_until_stockout)
+        : effectiveVelocity > 0
+        ? Math.round((product.currentStock / effectiveVelocity) * 10) / 10
+        : 999;
+
     const hoursUntilStockout = Math.round(daysUntilStockout * 24);
 
     // Stock status flag
@@ -61,15 +78,17 @@ export function generateForecastAnalysis(products, transactions) {
       stockStatus = "low_stock";
       isReorderNeeded = true;
       urgency = "warning";
-    } else if (daysUntilStockout > 60 && velocity < 0.3) {
+    } else if (daysUntilStockout > 60 && effectiveVelocity < 0.3) {
       stockStatus = "slow_moving";
       urgency = "excess";
     }
 
-    // Recommended order quantity (rounded up to nearest pack size)
+    // Recommended order quantity
     let recommendedOrderQty = 0;
-    if (isReorderNeeded) {
-      const targetStockLevel = Math.ceil(effectiveLeadTime * Math.max(velocity, 1)) + product.minSafetyStock;
+    if (backendRisk?.recommended_reorder_quantity !== undefined && backendRisk?.recommended_reorder_quantity > 0) {
+      recommendedOrderQty = backendRisk.recommended_reorder_quantity;
+    } else if (isReorderNeeded) {
+      const targetStockLevel = Math.ceil(effectiveLeadTime * Math.max(effectiveVelocity, 1)) + product.minSafetyStock;
       const deficit = targetStockLevel - product.currentStock;
       const packs = Math.max(1, Math.ceil(deficit / product.reorderPackSize));
       recommendedOrderQty = packs * product.reorderPackSize;
@@ -80,18 +99,20 @@ export function generateForecastAnalysis(products, transactions) {
     if (product.currentStock === 0) {
       rationale = `Critical stock-out: 0 units on shelf. Lead time is ${product.supplierLeadTimeDays} days. Immediate order of ${recommendedOrderQty} units required to restore supply.`;
     } else if (urgency === "critical") {
-      rationale = `Rapid burn rate (${velocity} units/day) with ${product.currentStock} units left. Stock-out projected within ${hoursUntilStockout} hours. Lead time is ${product.supplierLeadTimeDays} days -> immediate reorder recommended.`;
+      rationale = `Rapid burn rate (${predictedDailyDemand} units/day forecast) with ${product.currentStock} units left. Stock-out projected within ${hoursUntilStockout} hours. Lead time is ${product.supplierLeadTimeDays} days -> immediate reorder recommended.`;
     } else if (urgency === "warning") {
       rationale = `Stock (${product.currentStock} units) below safety threshold (${product.minSafetyStock} units). Lead time is ${product.supplierLeadTimeDays} days -> reorder recommended before buffer depletes.`;
     } else if (urgency === "excess") {
-      rationale = `Low sales velocity (${velocity} units/day) with ${Math.round(daysUntilStockout)} days of stock on shelf ($${(product.currentStock * product.costPrice).toFixed(2)} tied capital). Consider promotional bundling.`;
+      rationale = `Low sales velocity (${predictedDailyDemand} units/day) with ${Math.round(daysUntilStockout)} days of stock on shelf ($${(product.currentStock * product.costPrice).toFixed(2)} tied capital). Consider promotional bundling.`;
     } else {
-      rationale = `Inventory level stable. Current runout timeline is ${daysUntilStockout} days at current sales rate (${velocity} units/day).`;
+      rationale = `Inventory level stable. Current runout timeline is ${daysUntilStockout} days at predicted demand rate (${predictedDailyDemand} units/day).`;
     }
 
     return {
       ...product,
       velocity,
+      predictedDailyDemand,
+      forecastSource,
       daysUntilStockout,
       hoursUntilStockout,
       stockStatus,
@@ -99,7 +120,7 @@ export function generateForecastAnalysis(products, transactions) {
       isReorderNeeded,
       recommendedOrderQty,
       recommendedOrderCost: Math.round(recommendedOrderQty * product.costPrice * 100) / 100,
-      rationale
+      rationale,
     };
   });
 

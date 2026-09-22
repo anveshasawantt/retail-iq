@@ -3,6 +3,7 @@ Pydantic schemas -- these define what the API returns as JSON,
 separate from the ORM models which define the DB table structure.
 """
 
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
@@ -105,3 +106,34 @@ class StockRiskOut(BaseModel):
     days_until_stockout: Optional[float] = None  # None means "not selling / can't project"
     lead_time_days: int
     status: str  # "urgent" | "low_stock" | "healthy"
+    forecast_source: Optional[str] = "velocity_baseline"  # "xgboost" | "velocity_baseline"
+    predicted_daily_demand: Optional[float] = None
+    recommended_reorder_quantity: Optional[int] = None
+
+
+
+class TransactionItemOut(BaseModel):
+    product_id: int
+    barcode: str
+    name: str
+    quantity: int
+    unit_price: float
+    line_total: float
+
+    class Config:
+        from_attributes = True
+
+
+class TransactionOut(BaseModel):
+    id: int
+    invoice_number: str
+    subtotal: float
+    gst_amount: float
+    discount_amount: float
+    total: float
+    payment_mode: str
+    created_at: datetime
+    items: list[TransactionItemOut]
+
+    class Config:
+        from_attributes = True
