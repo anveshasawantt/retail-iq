@@ -3,6 +3,8 @@ import { AlertCircle, PlusCircle, X } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
 
 export default function UnknownBarcodeModal({ barcode, onClose, onOpenCatalogAdd }) {
+  if (!barcode) return null;
+
   const displayBarcode = typeof barcode === "object" ? barcode.barcode : barcode;
   const isFoundOnOFF = typeof barcode === "object" && barcode.found;
 
