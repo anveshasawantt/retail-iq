@@ -64,7 +64,7 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
     // Stock status flag
     let stockStatus = "healthy";
     let isReorderNeeded = false;
-    let urgency = "normal"; // "critical" | "warning" | "optimal" | "excess"
+    let urgency = "normal"; // "critical" | "warning" | "normal" | "excess"
 
     if (product.currentStock === 0) {
       stockStatus = "out_of_stock";
@@ -103,7 +103,7 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
     } else if (urgency === "warning") {
       rationale = `Stock (${product.currentStock} units) below safety threshold (${product.minSafetyStock} units). Lead time is ${product.supplierLeadTimeDays} days -> reorder recommended before buffer depletes.`;
     } else if (urgency === "excess") {
-      rationale = `Low sales velocity (${predictedDailyDemand} units/day) with ${Math.round(daysUntilStockout)} days of stock on shelf ($${(product.currentStock * product.costPrice).toFixed(2)} tied capital). Consider promotional bundling.`;
+      rationale = `Low sales velocity (${predictedDailyDemand} units/day) with ${Math.round(daysUntilStockout)} days of stock on shelf (Rs.${(product.currentStock * product.costPrice).toFixed(2)} tied capital). Consider promotional bundling.`;
     } else {
       rationale = `Inventory level stable. Current runout timeline is ${daysUntilStockout} days at predicted demand rate (${predictedDailyDemand} units/day).`;
     }
@@ -148,7 +148,7 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
 
   const topSelling = Object.keys(salesMap)
     .map(prodId => {
-      const prod = products.find(p => p.id === prodId);
+    const prod = products.find(p => p.id === Number(prodId));
       return {
         id: prodId,
         name: salesMap[prodId].name,
