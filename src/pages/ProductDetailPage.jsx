@@ -196,10 +196,10 @@ export default function ProductDetailPage({ productId, navigate }) {
           </span>
           <div className="mt-2 flex items-baseline gap-2 font-mono">
             <span className="text-2xl font-bold text-slate-900">{marginPct}%</span>
-            <span className="text-xs text-emerald-600 font-semibold">+₹{marginDollar.toFixed(2)}</span>
+            <span className="text-xs text-emerald-600 font-semibold">+{formatINR(marginDollar)}</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">
-            Selling: ₹{product.sellingPrice} | Cost: ₹{product.costPrice}
+            Selling: {formatINR(product.sellingPrice)} | Cost: {formatINR(product.costPrice)}
           </div>
         </div>
 
@@ -257,7 +257,7 @@ export default function ProductDetailPage({ productId, navigate }) {
           <div className="p-3 bg-slate-50 rounded border border-slate-200">
             <span className="text-slate-500">Suggested Order:</span>
             <div className="text-sm font-bold font-mono text-slate-900 mt-0.5">
-              {simulatedReorderQty} units (₹{simulatedOrderCost.toFixed(2)})
+              {simulatedReorderQty} units ({formatINR(simulatedOrderCost)})
             </div>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default function ProductDetailPage({ productId, navigate }) {
                     {new Date(tx.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                   </span>
                   <span className="font-mono font-bold text-slate-900">
-                    ₹{tx.total.toFixed(2)}
+                    {formatINR(tx.total)}
                   </span>
                 </div>
               ))}

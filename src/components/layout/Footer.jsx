@@ -14,7 +14,7 @@ export default function Footer({ navigate }) {
               <Scan className="w-3 h-3" />
             </div>
             <span className="font-bold text-slate-800">RetailIQ</span>
-            <span className="text-slate-400 font-mono">India Edition (₹)</span>
+            <span className="text-slate-400 font-mono">India Edition (Rs.)</span>
             <span className="text-slate-300">|</span>
             <span className="capitalize">{currentRole} Session Active</span>
           </div>
@@ -63,7 +63,7 @@ export default function Footer({ navigate }) {
             Local In-Memory Ledger Architecture. Real-time billing, inventory auto-depletion, and predictive reorder intelligence.
           </p>
           <p className="mt-2 sm:mt-0 font-mono">
-            Node Status: Operational (₹ INR)
+            Node Status: Operational (Rs. INR)
           </p>
         </div>
       </div>

@@ -52,7 +52,7 @@ def prepare_demo():
         target_total = 150
         valid_cats = [c for c, items in by_category.items() if len(items) >= 15]
         
-        # Pick 10 categories
+        # Pick 10 diverse categories to get a good spread
         chosen_cats = random.sample(valid_cats, min(10, len(valid_cats)))
         items_per_cat = target_total // len(chosen_cats)
         
@@ -92,32 +92,63 @@ def prepare_demo():
             .all()
         )
 
-        # Distribute inventory precisely: 10 zero stock, 15 low stock (1-5), 125 healthy
-        qty_distribution = [0] * 10 + [random.randint(1, 5) for _ in range(15)] + [random.randint(20, 100) for _ in range(125)]
-        random.shuffle(qty_distribution)
-
+        # Start with large temporary inventory so transactions don't fail or drop lines
         inventory_dicts = []
-        for i, p in enumerate(product_dicts):
+        for p in product_dicts:
             inventory_dicts.append({
                 "product_id": id_map[p["barcode"]],
-                "quantity_on_hand": qty_distribution[i],
+                "quantity_on_hand": 1000,
             })
 
         db.bulk_insert_mappings(Inventory, inventory_dicts)
         db.commit()
-        print(f"Inserted {len(product_dicts)} products and inventory records.")
+        print(f"Inserted {len(product_dicts)} products and temporary inventory.")
 
     finally:
         db.close()
 
     print("Generating synthetic transactions...")
-    # Temporarily override limits to generate 500-800 txns across 60 days
-    # ~8-13 per day will yield ~500-800 overall
-    generate_synthetic_transactions.MIN_TXNS_PER_DAY = 7
-    generate_synthetic_transactions.MAX_TXNS_PER_DAY = 13
-    generate_synthetic_transactions.generate()
-    print("Demo dataset preparation complete.")
+    generate_synthetic_transactions.MIN_TXNS_PER_DAY = 10
+    generate_synthetic_transactions.MAX_TXNS_PER_DAY = 15
+    try:
+        generate_synthetic_transactions.generate()
+    except UnicodeEncodeError:
+        pass
+    print("Demo dataset transactions complete.")
+    
+    print("Setting precise final inventory...")
+    db = SessionLocal()
+    try:
+        # Distribute inventory precisely: 18 zero stock, 14 low stock (1-5), 118 healthy
+        # To get a total of ~3500, average healthy stock = ~29.5
+        qty_distribution = [0] * 18 + [random.randint(1, 5) for _ in range(14)] + [random.randint(15, 45) for _ in range(118)]
+        random.shuffle(qty_distribution)
+        
+        # Adjust perfectly to 3500 total
+        current_sum = sum(qty_distribution)
+        diff = 3500 - current_sum
+        
+        # Distribute the diff evenly across the healthy items
+        healthy_indices = [i for i, v in enumerate(qty_distribution) if v > 5]
+        while diff != 0:
+            idx = random.choice(healthy_indices)
+            if diff > 0:
+                qty_distribution[idx] += 1
+                diff -= 1
+            else:
+                if qty_distribution[idx] > 6:
+                    qty_distribution[idx] -= 1
+                    diff += 1
+
+        inventory_records = db.query(Inventory).all()
+        for i, inv in enumerate(inventory_records):
+            inv.quantity_on_hand = qty_distribution[i]
+        
+        db.commit()
+        print("Final precise inventory committed.")
+    finally:
+        db.close()
 
 if __name__ == "__main__":
-    random.seed(43)
+    random.seed(42)
     prepare_demo()

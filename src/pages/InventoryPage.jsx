@@ -126,7 +126,7 @@ export default function InventoryPage({ navigate }) {
                 <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Item & SKU</th>
                   <th className="py-3 px-3">Category</th>
-                  <th className="py-3 px-3 text-right">Price (₹)</th>
+                  <th className="py-3 px-3 text-right">Price (Rs.)</th>
                   <th className="py-3 px-3 text-center">Margin</th>
                   <th className="py-3 px-3 text-center">Stock</th>
                   <th className="py-3 px-3 text-center">Velocity</th>
@@ -152,8 +152,8 @@ export default function InventoryPage({ navigate }) {
                       </td>
                       <td className="py-3.5 px-3 text-slate-600">{prod.category}</td>
                       <td className="py-3.5 px-3 text-right font-mono">
-                        <div className="font-bold text-slate-900">₹{prod.sellingPrice.toFixed(2)}</div>
-                        <div className="text-[10px] text-slate-400">Cost: ₹{prod.costPrice.toFixed(2)}</div>
+                        <div className="font-bold text-slate-900">{formatINR(prod.sellingPrice)}</div>
+                        <div className="text-[10px] text-slate-400">Cost: {formatINR(prod.costPrice)}</div>
                       </td>
                       <td className="py-3.5 px-3 text-center">
                         <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">

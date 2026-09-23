@@ -51,7 +51,7 @@ export default function Header({ currentPath, navigate }) {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base tracking-tight text-white">RetailIQ</span>
                 <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700 font-mono">
-                  IN (₹)
+                  IN (Rs.)
                 </span>
               </div>
             </button>

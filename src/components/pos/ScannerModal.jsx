@@ -132,7 +132,7 @@ export default function ScannerModal({ isOpen, onClose, onScanSuccess }) {
                     </div>
                   </div>
                   <span className="text-xs font-bold text-slate-800 font-mono flex-shrink-0">
-                    ₹{prod.sellingPrice.toFixed(2)}
+                    {formatINR(prod.sellingPrice)}
                   </span>
                 </button>
               ))}

@@ -254,7 +254,7 @@ export default function PosPage({ navigate }) {
                           </div>
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-medium text-slate-700">
-                          ₹{item.unitPrice.toFixed(2)}
+                          {formatINR(item.unitPrice)}
                         </td>
                         <td className="py-3 px-3 text-center">
                           <div className="inline-flex items-center border border-slate-300 rounded-md bg-white">
@@ -287,7 +287,7 @@ export default function PosPage({ navigate }) {
                           </select>
                         </td>
                         <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
-                          ₹{item.lineTotal.toFixed(2)}
+                          {formatINR(item.lineTotal)}
                         </td>
                         <td className="py-3 px-3 text-center">
                           <button
@@ -318,15 +318,15 @@ export default function PosPage({ navigate }) {
             <div className="py-4 space-y-2.5 text-xs text-slate-600 border-b border-slate-200">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span className="font-mono font-semibold text-slate-900">₹{subtotal.toFixed(2)}</span>
+                <span className="font-mono font-semibold text-slate-900">{formatINR(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span>GST (5%):</span>
-                <span className="font-mono font-semibold text-slate-900">₹{gst.toFixed(2)}</span>
+                <span className="font-mono font-semibold text-slate-900">{formatINR(gst)}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-100">
                 <span>Grand Total:</span>
-                <span className="font-mono text-xl text-slate-950">₹{grandTotal.toFixed(2)}</span>
+                <span className="font-mono text-xl text-slate-950">{formatINR(grandTotal)}</span>
               </div>
             </div>
 
@@ -412,7 +412,7 @@ export default function PosPage({ navigate }) {
                 {parseFloat(cashTendered) >= grandTotal && (
                   <div className="p-2 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 flex justify-between text-xs font-semibold">
                     <span>Change Due:</span>
-                    <span className="font-mono">₹{(parseFloat(cashTendered) - grandTotal).toFixed(2)}</span>
+                    <span className="font-mono">{formatINR((parseFloat(cashTendered) - grandTotal))}</span>
                   </div>
                 )}
               </div>
@@ -431,7 +431,7 @@ export default function PosPage({ navigate }) {
                 }`}
               >
                 <span>Checkout & Print Bill</span>
-                <span className="font-mono">(₹{grandTotal.toFixed(2)})</span>
+                <span className="font-mono">({formatINR(grandTotal)})</span>
               </button>
               <p className="text-[11px] text-slate-400 text-center mt-2">
                 Auto-updates stock and triggers inventory intelligence.

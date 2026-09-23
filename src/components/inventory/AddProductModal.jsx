@@ -183,7 +183,7 @@ export default function AddProductModal({ isOpen, initialBarcode = "", onClose, 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Selling Price (₹) *
+                Selling Price (Rs.) *
               </label>
               <input
                 type="number"
@@ -198,7 +198,7 @@ export default function AddProductModal({ isOpen, initialBarcode = "", onClose, 
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Wholesale Cost (₹)
+                Wholesale Cost (Rs.)
               </label>
               <input
                 type="number"

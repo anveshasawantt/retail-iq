@@ -89,7 +89,7 @@ export default function DashboardPage({ navigate }) {
     const po = approveReorder(product, qty);
     setActivePoMessage({
       poId: po.id,
-      text: `Purchase Order ${po.id} dispatched to ${product.supplierName} for ${qty} ${product.unit}s (&#8377;${(qty * product.costPrice).toFixed(2)}). Status: In Transit.`,
+      text: `Purchase Order ${po.id} dispatched to ${product.supplierName} for ${qty} ${product.unit}s (${formatINR(qty * product.costPrice)}). Status: In Transit.`,
     });
   };
 
@@ -106,7 +106,7 @@ export default function DashboardPage({ navigate }) {
   const hasSlowMovers = analyticsData?.slow_movers?.length > 0;
   const periodLabel = analyticsData ? `Last ${analyticsData.period_days} days` : null;
   const totalRevLabel = analyticsData
-    ? `&#8377;${Number(analyticsData.total_revenue).toLocaleString("en-IN")} total (${analyticsData.total_transactions} transactions)`
+    ? `${formatINR(analyticsData.total_revenue)} total (${analyticsData.total_transactions} transactions)`
     : null;
 
   return (
@@ -155,13 +155,12 @@ export default function DashboardPage({ navigate }) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="Today's Sales"
-          value={`&#8377;${todayRevenue.toFixed(2)}`}
+          value={`${formatINR(todayRevenue)}`}
           sub={`${todayTxCount} register transactions today`}
-          icon={IndianRupee}
         />
         <KpiCard
           label="Avg Bill Value"
-          value={`&#8377;${avgBasket.toFixed(2)}`}
+          value={`${formatINR(avgBasket)}`}
           sub="Calculated across active bills"
           icon={ShoppingBag}
         />
@@ -347,7 +346,7 @@ export default function DashboardPage({ navigate }) {
                   <th className="py-3 px-3 text-center">Demand/Day</th>
                   <th className="py-3 px-3 text-center">Lead Time</th>
                   <th className="py-3 px-4 text-right">Order Qty</th>
-                  <th className="py-3 px-4 text-right">Cost (&#8377;)</th>
+                  <th className="py-3 px-4 text-right">Cost (Rs.)</th>
                   <th className="py-3 px-4 text-center">Action</th>
                 </tr>
               </thead>

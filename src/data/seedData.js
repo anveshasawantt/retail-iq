@@ -1,6 +1,6 @@
 /**
  * Seed data for RetailIQ (Indian Retail Edition)
- * Authentic FMCG & grocery catalog in Indian Rupees (INR - ₹)
+ * Authentic FMCG & grocery catalog in Indian Rupees (INR - Rs.)
  */
 
 export const SEED_PRODUCTS = [

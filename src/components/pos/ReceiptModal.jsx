@@ -80,10 +80,10 @@ export default function ReceiptModal({ transaction, onClose }) {
                     <div className="font-medium text-slate-800 truncate">{item.name}</div>
                     <div className="flex justify-between text-slate-500 text-[10px]">
                       <span>
-                        {item.quantity} @ ₹{item.unitPrice.toFixed(2)}
+                        {item.quantity} @ {formatINR(item.unitPrice)}
                         {item.discountPercent > 0 ? ` (-${item.discountPercent}%)` : ""}
                       </span>
-                      <span className="text-slate-900 font-medium">₹{item.lineTotal.toFixed(2)}</span>
+                      <span className="text-slate-900 font-medium">{formatINR(item.lineTotal)}</span>
                     </div>
                   </div>
                 ))}
@@ -94,15 +94,15 @@ export default function ReceiptModal({ transaction, onClose }) {
             <div className="space-y-1 border-b border-dashed border-slate-300 pb-3 mb-3 text-[11px]">
               <div className="flex justify-between text-slate-600">
                 <span>Subtotal:</span>
-                <span>₹{transaction.subtotal.toFixed(2)}</span>
+                <span>{formatINR(transaction.subtotal)}</span>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>GST (5%):</span>
-                <span>₹{transaction.tax.toFixed(2)}</span>
+                <span>{formatINR(transaction.tax)}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-slate-900 pt-1 border-t border-slate-200">
                 <span>TOTAL:</span>
-                <span>₹{transaction.total.toFixed(2)}</span>
+                <span>{formatINR(transaction.total)}</span>
               </div>
             </div>
 
@@ -116,11 +116,11 @@ export default function ReceiptModal({ transaction, onClose }) {
                 <>
                   <div className="flex justify-between">
                     <span>Cash Tendered:</span>
-                    <span>₹{(transaction.cashTendered || transaction.total).toFixed(2)}</span>
+                    <span>{formatINR((transaction.cashTendered || transaction.total))}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-emerald-700">
                     <span>Change Due:</span>
-                    <span>₹{(transaction.changeDue || 0).toFixed(2)}</span>
+                    <span>{formatINR((transaction.changeDue || 0))}</span>
                   </div>
                 </>
               )}

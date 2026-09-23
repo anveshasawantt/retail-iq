@@ -23,7 +23,7 @@ const CustomTooltip = ({ active, payload }) => {
       </div>
       <div className="flex justify-between gap-4 mt-0.5">
         <span className="text-slate-500">Revenue</span>
-        <span className="font-mono font-semibold text-emerald-700">&#8377;{Number(d?.revenue || 0).toLocaleString("en-IN")}</span>
+        <span className="font-mono font-semibold text-emerald-700">{formatINR(d?.revenue)}</span>
       </div>
     </div>
   );
