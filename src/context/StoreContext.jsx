@@ -526,16 +526,32 @@ export function StoreProvider({ children }) {
     );
   };
 
-  const resetToSeedData = () => {
-    setProducts(SEED_PRODUCTS);
-    setTransactions(SEED_TRANSACTIONS);
-    setPurchaseOrders(SEED_PURCHASE_ORDERS);
-    setCart([]);
-    setLastReceipt(null);
-    setUnknownBarcodeScanned(null);
-    localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
-    localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
-    localStorage.removeItem(STORAGE_KEYS.PURCHASE_ORDERS);
+  const resetToSeedData = async () => {
+    try {
+      if (apiConnected) {
+        await api.resetData({ 
+          products: SEED_PRODUCTS, 
+          transactions: SEED_TRANSACTIONS,
+          purchaseOrders: SEED_PURCHASE_ORDERS
+        });
+        await refreshStoreData();
+      } else {
+        setProducts(SEED_PRODUCTS);
+        setTransactions(SEED_TRANSACTIONS);
+      }
+    } catch (err) {
+      console.error("Reset API failed:", err);
+      setProducts(SEED_PRODUCTS);
+      setTransactions(SEED_TRANSACTIONS);
+    } finally {
+      setPurchaseOrders(SEED_PURCHASE_ORDERS);
+      setCart([]);
+      setLastReceipt(null);
+      setUnknownBarcodeScanned(null);
+      localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
+      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
+      localStorage.removeItem(STORAGE_KEYS.PURCHASE_ORDERS);
+    }
   };
 
   const value = {

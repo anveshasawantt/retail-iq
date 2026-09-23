@@ -22,7 +22,7 @@ export default function ProductDetailPage({ productId, navigate }) {
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [orderSentMessage, setOrderSentMessage] = useState(null);
 
-  const product = products.find((p) => p.id === productId);
+  const product = products.find((p) => String(p.id) === String(productId));
 
   if (!product) {
     return (
