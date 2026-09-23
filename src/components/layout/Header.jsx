@@ -3,7 +3,6 @@ import {
   Scan, 
   BarChart3, 
   Package, 
-  RotateCcw, 
   UserCheck, 
   ChevronDown
 } from "lucide-react";
@@ -11,7 +10,7 @@ import { useStore } from "../../context/StoreContext";
 import { generateForecastAnalysis } from "../../services/forecastingEngine";
 
 export default function Header({ currentPath, navigate }) {
-  const { products, transactions, currentRole, switchRole, resetToSeedData } = useStore();
+  const { products, transactions, currentRole, switchRole } = useStore();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
 
   const forecast = generateForecastAnalysis(products, transactions);
