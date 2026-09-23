@@ -4,8 +4,8 @@ export default function SeoHelmet({ title, description, schemaData }) {
   useEffect(() => {
     // 1. Update Document Title
     const fullTitle = title 
-      ? `${title} | ApexRetail OS` 
-      : "ApexRetail OS - Smart Retail Management & Inventory Intelligence";
+      ? `${title} | RetailIQ` 
+      : "RetailIQ - Smart Retail Management & Inventory Intelligence";
     document.title = fullTitle;
 
     // 2. Update Meta Description

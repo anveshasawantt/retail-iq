@@ -42,7 +42,7 @@ export default function ReceiptModal({ transaction, onClose }) {
           >
             {/* Store Banner */}
             <div className="text-center border-b border-dashed border-slate-300 pb-3 mb-3">
-              <h3 className="font-bold text-sm text-slate-900 tracking-tight">APEXRETAIL SUPERMARKET</h3>
+              <h3 className="font-bold text-sm text-slate-900 tracking-tight">RETAILIQ SUPERMARKET</h3>
               <p className="text-[11px] text-slate-500">Store Node #104 (Bandra West)</p>
               <p className="text-[10px] text-slate-500">Linking Rd, Mumbai - 400050</p>
               <p className="text-[10px] text-slate-500">GSTIN: 27AABCA1234F1Z5</p>

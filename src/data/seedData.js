@@ -1,5 +1,5 @@
 /**
- * Seed data for ApexRetail OS (Indian Retail Edition)
+ * Seed data for RetailIQ (Indian Retail Edition)
  * Authentic FMCG & grocery catalog in Indian Rupees (INR - ₹)
  */
 

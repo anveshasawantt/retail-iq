@@ -50,7 +50,7 @@ export default function Header({ currentPath, navigate }) {
                 <Scan className="w-5 h-5 text-slate-950 stroke-[2.5]" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base tracking-tight text-white">ApexRetail</span>
+                <span className="font-bold text-base tracking-tight text-white">RetailIQ</span>
                 <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700 font-mono">
                   IN (₹)
                 </span>
@@ -87,19 +87,7 @@ export default function Header({ currentPath, navigate }) {
 
           {/* Right Action Controls: Clean & Uncluttered */}
           <div className="flex items-center gap-3">
-            {/* Reset Data Button (Icon Only on small, clean label on desktop) */}
-            <button
-              onClick={() => {
-                if (window.confirm("Reset catalog and transactions to initial seed state?")) {
-                  resetToSeedData();
-                }
-              }}
-              title="Reset to factory demo data"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/80 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Reset Data</span>
-            </button>
+
 
             {/* Role Switcher Menu */}
             <div className="relative">

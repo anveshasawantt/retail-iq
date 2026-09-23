@@ -63,12 +63,5 @@ export const api = {
     }),
   getTransactions: (skip = 0, limit = 200) => request(`/billing/transactions?skip=${skip}&limit=${limit}`),
   getAnalytics: (periodDays = 30) => request(`/billing/analytics?period_days=${periodDays}`),
-  
-  // Data reset
-  resetData: (payload) =>
-    request("/reset", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
 };
 

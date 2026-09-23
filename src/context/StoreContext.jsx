@@ -6,10 +6,10 @@ import { api } from "../services/api";
 const StoreContext = createContext();
 
 const STORAGE_KEYS = {
-  PRODUCTS: "apexretail_inr_products_v2",
-  TRANSACTIONS: "apexretail_inr_transactions_v2",
-  PURCHASE_ORDERS: "apexretail_inr_pos_v2",
-  ROLE: "apexretail_inr_role_v2",
+  PRODUCTS: "retailiq_inr_products_v2",
+  TRANSACTIONS: "retailiq_inr_transactions_v2",
+  PURCHASE_ORDERS: "retailiq_inr_pos_v2",
+  ROLE: "retailiq_inr_role_v2",
 };
 
 export function StoreProvider({ children }) {
@@ -526,33 +526,6 @@ export function StoreProvider({ children }) {
     );
   };
 
-  const resetToSeedData = async () => {
-    try {
-      if (apiConnected) {
-        await api.resetData({ 
-          products: SEED_PRODUCTS, 
-          transactions: SEED_TRANSACTIONS,
-          purchaseOrders: SEED_PURCHASE_ORDERS
-        });
-        await refreshStoreData();
-      } else {
-        setProducts(SEED_PRODUCTS);
-        setTransactions(SEED_TRANSACTIONS);
-      }
-    } catch (err) {
-      console.error("Reset API failed:", err);
-      setProducts(SEED_PRODUCTS);
-      setTransactions(SEED_TRANSACTIONS);
-    } finally {
-      setPurchaseOrders(SEED_PURCHASE_ORDERS);
-      setCart([]);
-      setLastReceipt(null);
-      setUnknownBarcodeScanned(null);
-      localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
-      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
-      localStorage.removeItem(STORAGE_KEYS.PURCHASE_ORDERS);
-    }
-  };
 
   const value = {
     products,
@@ -582,7 +555,6 @@ export function StoreProvider({ children }) {
     approveReorder,
     receivePurchaseOrder,
     getActivePOForProduct,
-    resetToSeedData,
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

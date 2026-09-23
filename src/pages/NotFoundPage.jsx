@@ -23,7 +23,7 @@ export default function NotFoundPage({ navigate }) {
         </h1>
 
         <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-          The routing path you attempted to access does not exist in this ApexRetail node terminal. Use the verified platform routes below to navigate.
+          The routing path you attempted to access does not exist in this RetailIQ node terminal. Use the verified platform routes below to navigate.
         </p>
 
         <div className="pt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">

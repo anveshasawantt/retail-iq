@@ -7,7 +7,7 @@ export default function PrivacyPage({ navigate }) {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <SeoHelmet
         title="Privacy Policy and Transaction Data Protection"
-        description="Data collection standards, cashier audit logging, and customer payment security policies for ApexRetail OS."
+        description="Data collection standards, cashier audit logging, and customer payment security policies for RetailIQ."
       />
 
       <Breadcrumbs items={[{ label: "Privacy Policy" }]} navigate={navigate} />
@@ -25,7 +25,7 @@ export default function PrivacyPage({ navigate }) {
         <section className="space-y-2">
           <h2 className="text-sm font-bold text-slate-900">1. Data Architecture and Local Storage</h2>
           <p>
-            ApexRetail OS operates with a local-first in-memory architecture. Transaction receipts, catalog items, and stock level records reside within the store terminal memory and localized browser cache storage. No telemetry or unencrypted transaction streams are broadcast to third-party ad networks.
+            RetailIQ operates with a local-first in-memory architecture. Transaction receipts, catalog items, and stock level records reside within the store terminal memory and localized browser cache storage. No telemetry or unencrypted transaction streams are broadcast to third-party ad networks.
           </p>
         </section>
 
@@ -51,7 +51,7 @@ export default function PrivacyPage({ navigate }) {
         </section>
 
         <div className="pt-4 border-t border-slate-200 flex justify-between items-center text-slate-500 text-[11px]">
-          <span>ApexRetail Compliance and Security Unit</span>
+          <span>RetailIQ Compliance and Security Unit</span>
           <button
             onClick={() => navigate("/terms")}
             className="text-slate-800 font-semibold hover:underline"

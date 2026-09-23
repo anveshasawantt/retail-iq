@@ -46,7 +46,7 @@ export default function TermsPage({ navigate }) {
         <section className="space-y-2">
           <h2 className="text-sm font-bold text-slate-900">4. Hardware Compatibility and Optical Scanners</h2>
           <p>
-            The software supports standard keyboard-wedge barcode scanners (emitting standard HID input with newline carriage return) as well as optical camera video feed decoders. ApexRetail OS is not responsible for hardware transmission faults or damaged UPC/EAN labels that impair optical readability.
+            The software supports standard keyboard-wedge barcode scanners (emitting standard HID input with newline carriage return) as well as optical camera video feed decoders. RetailIQ is not responsible for hardware transmission faults or damaged UPC/EAN labels that impair optical readability.
           </p>
         </section>
 
@@ -58,7 +58,7 @@ export default function TermsPage({ navigate }) {
         </section>
 
         <div className="pt-4 border-t border-slate-200 flex justify-between items-center text-slate-500 text-[11px]">
-          <span>ApexRetail Operating Systems Corporation</span>
+          <span>RetailIQ Operating Systems Corporation</span>
           <button
             onClick={() => navigate("/privacy")}
             className="text-slate-800 font-semibold hover:underline"
