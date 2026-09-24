@@ -376,13 +376,11 @@ export function StoreProvider({ children }) {
     }
   };
 
-  const adjustProductStock = async (productId, delta, reason = "Manual adjustment") => {
-    const numDelta = Number(delta);
-    const mode = numDelta >= 0 ? "add" : "deduct";
-    const qty = Math.abs(numDelta);
-
+  const adjustProductStock = async (productId, mode, qty, reason = "Manual adjustment") => {
     try {
-      await api.adjustInventory(productId, mode, qty, reason);
+      if (apiConnected && typeof productId === "number") {
+        await api.adjustInventory(productId, mode, qty, reason);
+      }
     } catch (err) {
       console.warn("Stock adjustment API failed, applying locally:", err.message);
     }
@@ -390,7 +388,10 @@ export function StoreProvider({ children }) {
     setProducts((prevProducts) =>
       prevProducts.map((p) => {
         if (p.id === productId) {
-          const nextStock = Math.max(0, p.currentStock + numDelta);
+          let nextStock = p.currentStock;
+          if (mode === "add") nextStock += qty;
+          else if (mode === "deduct") nextStock = Math.max(0, nextStock - qty);
+          else if (mode === "set") nextStock = qty;
           return { ...p, currentStock: nextStock };
         }
         return p;
@@ -496,6 +497,10 @@ export function StoreProvider({ children }) {
     };
 
     setPurchaseOrders((prev) => [newPO, ...prev]);
+    // Persist PO approval to backend (fire‑and‑forget)
+    api.approvePurchaseOrder(poId).catch((err) => {
+      console.warn("Failed to approve PO on backend:", err);
+    });
     return newPO;
   };
 
@@ -504,16 +509,9 @@ export function StoreProvider({ children }) {
     const po = purchaseOrders.find((p) => p.id === poId);
     if (!po || po.status === "Received") return;
 
-    setProducts((prevProducts) =>
-      prevProducts.map((prod) => {
-        const item = po.items.find((i) => i.productId === prod.id);
-        if (item) {
-          adjustProductStock(prod.id, item.quantity, `Received PO ${poId}`);
-          return { ...prod, currentStock: prod.currentStock + item.quantity };
-        }
-        return prod;
-      })
-    );
+    po.items.forEach((item) => {
+      adjustProductStock(item.productId, "add", item.quantity, `Received PO ${poId}`);
+    });
 
     setPurchaseOrders((prevPOs) =>
       prevPOs.map((p) => (p.id === poId ? { ...p, status: "Received", receivedAt: new Date().toISOString() } : p))

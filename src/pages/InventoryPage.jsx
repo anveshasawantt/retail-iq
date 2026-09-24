@@ -16,7 +16,7 @@ import StockAdjustmentModal from "../components/inventory/StockAdjustmentModal";
 import { formatINR } from "../utils/currency";
 
 export default function InventoryPage({ navigate }) {
-  const { products, transactions, stockRiskData } = useStore();
+  const { products, transactions, stockRiskData, purchaseOrders } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -24,7 +24,7 @@ export default function InventoryPage({ navigate }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [adjustingProduct, setAdjustingProduct] = useState(null);
 
-  const forecast = generateForecastAnalysis(products, transactions, stockRiskData);
+  const forecast = generateForecastAnalysis(products, transactions, stockRiskData, purchaseOrders);
 
   const categories = useMemo(() => {
     const set = new Set(products.map((p) => p.category));
@@ -57,7 +57,7 @@ export default function InventoryPage({ navigate }) {
   }, [forecast.analyzedProducts, searchTerm, selectedCategory, selectedStatus]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <SeoHelmet
         title="Catalog Directory & Stock Replenishment Ledger"
         description="FMCG product catalogue, Indian barcode records, margin analytics, and stock adjustments."

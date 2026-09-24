@@ -36,7 +36,8 @@ export default function PosPage({ navigate }) {
     unknownBarcodeScanned,
     setUnknownBarcodeScanned,
     lastReceipt,
-    setLastReceipt
+    setLastReceipt,
+    analyticsData
   } = useStore();
 
   const [barcodeInput, setBarcodeInput] = useState("");
@@ -45,6 +46,8 @@ export default function PosPage({ navigate }) {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [pendingAddBarcode, setPendingAddBarcode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("UPI");
+const [searchTerm, setSearchTerm] = useState("");
+const [searchResults, setSearchResults] = useState([]);
   const [cashTendered, setCashTendered] = useState("");
   const barcodeInputRef = useRef(null);
 
@@ -53,6 +56,21 @@ export default function PosPage({ navigate }) {
       barcodeInputRef.current.focus();
     }
   }, [cart]);
+
+  // Debounced product search
+  useEffect(() => {
+    if (!searchTerm) {
+      setSearchResults([]);
+      return;
+    }
+    const handler = setTimeout(() => {
+      const results = products.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm, products]);
 
   const handleBarcodeSubmit = (e) => {
     e.preventDefault();
@@ -104,16 +122,22 @@ export default function PosPage({ navigate }) {
     setCashTendered("");
   };
 
-  const quickDemoItems = [
-    { label: "Amul Milk (1L)", code: "8901262010053", price: 72, tag: "Low Stock Trigger" },
-    { label: "Aashirvaad Atta (5kg)", code: "8901030382012", price: 265, tag: "Fast Mover" },
-    { label: "Fortune Sun Oil (1L)", code: "8906007280014", price: 145, tag: "Reorder Test" },
-    { label: "Tata Tea Gold (500g)", code: "8901052002014", price: 310, tag: "Beverage" },
-    { label: "Maggi Noodles", code: "8901058852309", price: 56, tag: "Packaged" },
-  ];
+  const quickDemoItems = (analyticsData?.top_products ?? []).filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  ).map(item => {
+    const matchedProduct = products.find(p => p.id === item.product_id);
+    return {
+      label: item.name,
+      code: matchedProduct?.barcode || item.name,
+      price: item.revenue ?? 0,
+      tag: item.category ?? ''
+    };
+  });
+
+
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <SeoHelmet
         title="Cashier POS Terminal"
         description="High-speed retail cashier point of sale with instant barcode scanning, discount controls, and automatic inventory depletion."
@@ -126,10 +150,18 @@ export default function PosPage({ navigate }) {
       {/* Clean, Quick Demo Bar */}
       <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
         <span className="text-xs font-bold text-slate-700 whitespace-nowrap">
-          Quick-Scan Demo:
+          Quick Scan:
         </span>
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-          {quickDemoItems.map((item, idx) => (
+                    <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="flex-1 min-w-[150px] px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
+          />
+
+            {quickDemoItems.map((item, idx) => (
             <button
               key={idx}
               onClick={() => handleQuickDemoScan(item.code)}
@@ -399,7 +431,7 @@ export default function PosPage({ navigate }) {
                       onClick={() => setCashTendered(String(denom))}
                       className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-mono rounded border border-slate-300"
                     >
-                      ₹{denom}
+                      {formatINR(denom)}
                     </button>
                   ))}
                   <button

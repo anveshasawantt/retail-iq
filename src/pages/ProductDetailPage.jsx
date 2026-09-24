@@ -27,7 +27,7 @@ export default function ProductDetailPage({ productId, navigate }) {
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+      <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 text-center">
         <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
         <h2 className="text-base font-bold text-slate-900">Product SKU Not Found</h2>
         <button
@@ -84,7 +84,7 @@ export default function ProductDetailPage({ productId, navigate }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <SeoHelmet
         title={`${product.name} - SKU Velocity Analysis`}
         description={`Inventory diagnostics, sales velocity, and lead-time replenishment simulation for ${product.name}.`}

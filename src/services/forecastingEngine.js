@@ -30,7 +30,7 @@ export function calculateProductVelocity(productId, transactions, daysWindow = 7
   return Math.round(rawVelocity * 10) / 10;
 }
 
-export function generateForecastAnalysis(products, transactions, stockRiskData = []) {
+export function generateForecastAnalysis(products, transactions, stockRiskData = [], purchaseOrders = []) {
   const analyzedProducts = products.map((product) => {
     const velocity = calculateProductVelocity(product.id, transactions, 7);
 
@@ -61,12 +61,21 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
 
     const hoursUntilStockout = Math.round(daysUntilStockout * 24);
 
+    const hasActivePO = purchaseOrders.some(po => 
+      ["Pending", "Approved", "In Transit"].includes(po.status) && 
+      po.items.some(i => i.productId === product.id)
+    );
+
     // Stock status flag
     let stockStatus = "healthy";
     let isReorderNeeded = false;
     let urgency = "normal"; // "critical" | "warning" | "normal" | "excess"
 
-    if (product.currentStock === 0) {
+    if (hasActivePO) {
+      stockStatus = "incoming";
+      isReorderNeeded = false;
+      urgency = "normal";
+    } else if (product.currentStock === 0) {
       stockStatus = "out_of_stock";
       isReorderNeeded = true;
       urgency = "critical";
@@ -85,7 +94,9 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
 
     // Recommended order quantity
     let recommendedOrderQty = 0;
-    if (backendRisk?.recommended_reorder_quantity !== undefined && backendRisk?.recommended_reorder_quantity > 0) {
+    if (hasActivePO) {
+      recommendedOrderQty = 0;
+    } else if (backendRisk?.recommended_reorder_quantity !== undefined && backendRisk?.recommended_reorder_quantity > 0) {
       recommendedOrderQty = backendRisk.recommended_reorder_quantity;
     } else if (isReorderNeeded) {
       const targetStockLevel = Math.ceil(effectiveLeadTime * Math.max(effectiveVelocity, 1)) + product.minSafetyStock;
@@ -96,7 +107,9 @@ export function generateForecastAnalysis(products, transactions, stockRiskData =
 
     // Plain-language diagnostic narrative (NO em dashes)
     let rationale = "";
-    if (product.currentStock === 0) {
+    if (hasActivePO) {
+      rationale = `Purchase order is currently in transit or pending. Delivery expected soon.`;
+    } else if (product.currentStock === 0) {
       rationale = `Critical stock-out: 0 units on shelf. Lead time is ${product.supplierLeadTimeDays} days. Immediate order of ${recommendedOrderQty} units required to restore supply.`;
     } else if (urgency === "critical") {
       rationale = `Rapid burn rate (${predictedDailyDemand} units/day forecast) with ${product.currentStock} units left. Stock-out projected within ${hoursUntilStockout} hours. Lead time is ${product.supplierLeadTimeDays} days -> immediate reorder recommended.`;

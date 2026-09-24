@@ -258,4 +258,13 @@ def stock_risk(db: Session = Depends(get_db)):
     # Sort urgent products first
     status_order = {"urgent": 0, "low_stock": 1, "healthy": 2}
     results.sort(key=lambda r: status_order[r.status])
-    return results
+    return results
+
+@router.post("/purchase-orders/{po_id}/approve", response_model=dict)
+def approve_purchase_order(po_id: str, db: Session = Depends(get_db)):
+    """Approve a purchase order.
+    This placeholder updates the status of a purchase order to 'Approved'.
+    In a full implementation, it would modify the PurchaseOrder model in the DB.
+    """
+    # TODO: Update PurchaseOrder status in database
+    return {"po_id": po_id, "status": "Approved"}

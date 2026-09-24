@@ -62,6 +62,10 @@ export const api = {
       }),
     }),
   getTransactions: (skip = 0, limit = 200) => request(`/billing/transactions?skip=${skip}&limit=${limit}`),
+  approvePurchaseOrder: (poId) =>
+    request(`/inventory/purchase-orders/${poId}/approve`, {
+      method: "POST",
+    }),
   getAnalytics: (periodDays = 30) => request(`/billing/analytics?period_days=${periodDays}`),
-};
 
+};

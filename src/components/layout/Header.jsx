@@ -10,10 +10,10 @@ import { useStore } from "../../context/StoreContext";
 import { generateForecastAnalysis } from "../../services/forecastingEngine";
 
 export default function Header({ currentPath, navigate }) {
-  const { products, transactions, currentRole, switchRole } = useStore();
+  const { products, transactions, currentRole, switchRole, purchaseOrders, stockRiskData } = useStore();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
 
-  const forecast = generateForecastAnalysis(products, transactions);
+  const forecast = generateForecastAnalysis(products, transactions, stockRiskData, purchaseOrders);
   const criticalAlertsCount = forecast.reorderRecommendations.filter((r) => r.urgency === "critical").length;
 
   const handleRoleToggle = (role) => {
@@ -37,7 +37,7 @@ export default function Header({ currentPath, navigate }) {
 
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <div className="flex items-center gap-8">

@@ -74,7 +74,7 @@ export default function DashboardPage({ navigate }) {
 
   const [activePoMessage, setActivePoMessage] = useState(null);
 
-  const forecast = generateForecastAnalysis(products, transactions, stockRiskData);
+  const forecast = generateForecastAnalysis(products, transactions, stockRiskData, purchaseOrders);
 
   // -- KPI Metrics --------------------------------------------------------------
   const todayStr = new Date().toISOString().split("T")[0];
@@ -111,7 +111,7 @@ export default function DashboardPage({ navigate }) {
     : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+    <div className="max-w-[1500px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-5">
       <SeoHelmet
         title="Store Operations & Inventory Dashboard"
         description="Real-time retail analytics, FMCG stock-out prediction, revenue trends, and automated purchase order replenishment."
