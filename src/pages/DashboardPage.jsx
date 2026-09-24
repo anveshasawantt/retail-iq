@@ -22,6 +22,7 @@ import RevenueChart from "../components/dashboard/RevenueChart";
 import TopProductsChart from "../components/dashboard/TopProductsChart";
 import CategoryChart from "../components/dashboard/CategoryChart";
 import SlowMoversTable from "../components/dashboard/SlowMoversTable";
+import { formatINR } from "../utils/currency";
 
 // -- Helpers -------------------------------------------------------------------
 

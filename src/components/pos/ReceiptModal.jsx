@@ -1,5 +1,6 @@
 import React from "react";
 import { Printer, CheckCircle2, X } from "lucide-react";
+import { formatINR } from "../../utils/currency";
 
 export default function ReceiptModal({ transaction, onClose }) {
   if (!transaction) return null;

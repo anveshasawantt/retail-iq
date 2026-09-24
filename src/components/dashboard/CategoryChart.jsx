@@ -2,6 +2,7 @@ import React from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
+import { formatINR } from "../../utils/currency";
 
 const PALETTE = [
   "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8",

@@ -16,6 +16,8 @@ import {
 import { useStore } from "../context/StoreContext";
 import SeoHelmet from "../components/common/SeoHelmet";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
+import { formatINR } from "../utils/currency";
+
 import ReceiptModal from "../components/pos/ReceiptModal";
 import ScannerModal from "../components/pos/ScannerModal";
 import UnknownBarcodeModal from "../components/pos/UnknownBarcodeModal";
@@ -103,11 +105,11 @@ export default function PosPage({ navigate }) {
   };
 
   const quickDemoItems = [
-    { label: "Amul Milk (1L)", code: "8901262010053", price: "₹72", tag: "Low Stock Trigger" },
-    { label: "Aashirvaad Atta (5kg)", code: "8901030382012", price: "₹265", tag: "Fast Mover" },
-    { label: "Fortune Sun Oil (1L)", code: "8906007280014", price: "₹145", tag: "Reorder Test" },
-    { label: "Tata Tea Gold (500g)", code: "8901052002014", price: "₹310", tag: "Beverage" },
-    { label: "Maggi Noodles", code: "8901058852309", price: "₹56", tag: "Packaged" },
+    { label: "Amul Milk (1L)", code: "8901262010053", price: 72, tag: "Low Stock Trigger" },
+    { label: "Aashirvaad Atta (5kg)", code: "8901030382012", price: 265, tag: "Fast Mover" },
+    { label: "Fortune Sun Oil (1L)", code: "8906007280014", price: 145, tag: "Reorder Test" },
+    { label: "Tata Tea Gold (500g)", code: "8901052002014", price: 310, tag: "Beverage" },
+    { label: "Maggi Noodles", code: "8901058852309", price: 56, tag: "Packaged" },
   ];
 
   return (

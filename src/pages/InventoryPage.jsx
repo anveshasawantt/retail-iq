@@ -13,6 +13,7 @@ import SeoHelmet from "../components/common/SeoHelmet";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
 import AddProductModal from "../components/inventory/AddProductModal";
 import StockAdjustmentModal from "../components/inventory/StockAdjustmentModal";
+import { formatINR } from "../utils/currency";
 
 export default function InventoryPage({ navigate }) {
   const { products, transactions, stockRiskData } = useStore();

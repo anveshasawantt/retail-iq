@@ -15,6 +15,7 @@ import { calculateProductVelocity } from "../services/forecastingEngine";
 import SeoHelmet from "../components/common/SeoHelmet";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
 import StockAdjustmentModal from "../components/inventory/StockAdjustmentModal";
+import { formatINR } from "../utils/currency";
 
 export default function ProductDetailPage({ productId, navigate }) {
   const { products, transactions, stockRiskData, approveReorder } = useStore();

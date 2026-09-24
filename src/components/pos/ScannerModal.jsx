@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Camera, X, Scan, AlertCircle, RefreshCw } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+import { formatINR } from "../../utils/currency";
 
 export default function ScannerModal({ isOpen, onClose, onScanSuccess }) {
   const { products } = useStore();

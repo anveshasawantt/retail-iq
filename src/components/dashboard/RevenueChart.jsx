@@ -2,6 +2,7 @@ import React from "react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
+import { formatINR } from "../../utils/currency";
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
